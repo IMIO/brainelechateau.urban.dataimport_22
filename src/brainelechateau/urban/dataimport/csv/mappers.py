@@ -439,7 +439,7 @@ class CompletionStateMapper(PostCreationMapper):
             else:
                 transition = 'accept'
         else:
-            if plone_object.portal_type in ['BuildLicence', 'ParcelOutLicence']:
+            if plone_object.portal_type in ['BuildLicence', 'ParcelOutLicence', 'UniqueLicence']:
                 datePermis = self.getData('Date Permis')
                 dateRefus = self.getData('Date Refus')
                 datePermisRecours = self.getData('Date Permis sur recours')
@@ -970,7 +970,7 @@ class DecisionEventIdMapper(Mapper):
 class DecisionEventDateMapper(Mapper):
     def mapDecisiondate(self, line):
         licence = self.importer.current_containers_stack[-1]
-        if licence.portal_type in ['BuildLicence', 'ParcelOutLicence', 'EnvClassOne', 'EnvClassTwo']:
+        if licence.portal_type in ['BuildLicence', 'ParcelOutLicence', 'EnvClassOne', 'EnvClassTwo', 'UniqueLicence']:
             datePermis = self.getData('Date Permis')
             dateRefus = self.getData('Date Refus')
             datePermisRecours = self.getData('Date Permis sur recours')
@@ -997,7 +997,7 @@ class DecisionEventDateMapper(Mapper):
 class DecisionEventDecisionMapper(Mapper):
     def mapDecision(self, line):
         licence = self.importer.current_containers_stack[-1]
-        if licence.portal_type in ['BuildLicence', 'ParcelOutLicence', 'EnvClassOne', 'EnvClassTwo']:
+        if licence.portal_type in ['BuildLicence', 'ParcelOutLicence', 'EnvClassOne', 'EnvClassTwo', 'UniqueLicence']:
             datePermis = self.getData('Date Permis')
             dateRefus = self.getData('Date Refus')
             datePermisRecours = self.getData('Date Permis sur recours')
@@ -1018,7 +1018,7 @@ class DecisionEventDecisionMapper(Mapper):
 class DecisionEventNotificationDateMapper(Mapper):
     def mapEventdate(self, line):
         licence = self.importer.current_containers_stack[-1]
-        if licence.portal_type in ['BuildLicence', 'ParcelOutLicence', 'EnvClassOne', 'EnvClassTwo']:
+        if licence.portal_type in ['BuildLicence', 'ParcelOutLicence', 'EnvClassOne', 'EnvClassTwo', 'UniqueLicence']:
             datePermis = self.getData('Date Permis')
             dateRefus = self.getData('Date Refus')
             datePermisRecours = self.getData('Date Permis sur recours')

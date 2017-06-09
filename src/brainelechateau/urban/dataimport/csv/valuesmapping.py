@@ -15,8 +15,8 @@ VALUES_MAPS = {
         'PX2': 'EnvClassTwo',
         'PE1': 'EnvClassOne',
         'PX1': 'EnvClassOne',
-        'PU1': 'BuildLicence',
-        'PU2': 'BuildLicence',
+        'PU1': 'UniqueLicence',
+        'PU2': 'UniqueLicence',
     },
 
     'eventtype_id_map': table({
@@ -30,6 +30,7 @@ VALUES_MAPS = {
         'EnvClassOne'        : ['decision', 'rapport-du-college', 'depot-de-la-demande', 'dossier-complet-recevable'],
         'EnvClassTwo'        : ['decision', 'rapport-du-college', 'depot-de-la-demande', 'dossier-complet-recevable'],
         'EnvClassThree'      : ['acceptation-de-la-demande', 'rapport-du-college', 'depot-de-la-demande',''],
+        'UniqueLicence'      : ['delivrance-du-permis-octroi-ou-refus', 'rapport-du-college', 'depot-de-la-demande','accuse-de-reception'],
     }),
 
     'solicitOpinionDictionary': {
