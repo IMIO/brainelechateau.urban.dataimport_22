@@ -188,11 +188,11 @@ def load_parcellings():
                                                     DGO4Reference=parcelling[header_indexes['ReferenceRW']],
                                                     numberOfParcels=parcelling[header_indexes['Nombre de lots']])
 
-                parcel = create_parcel(object_id,
-                                       parcelling[header_indexes['Parcelle1Section']],
-                                       parcelling[header_indexes['Parcelle1Numero']],
-                                       parcelling[header_indexes['Parcelle1NumeroSuite']],
-                                       parcelling[header_indexes['AdresseLocalite']])
+                # parcel = create_parcel(object_id,
+                #                        parcelling[header_indexes['Parcelle1Section']],
+                #                        parcelling[header_indexes['Parcelle1Numero']],
+                #                        parcelling[header_indexes['Parcelle1NumeroSuite']],
+                #                        parcelling[header_indexes['AdresseLocalite']])
 
 
 
@@ -250,7 +250,7 @@ def create_parcel(parcelling, section1, num1, num1suite, division):
         #check if we can find a parcel in the db cadastre with these infos
         found = searchview.search_parcels_custom(**parcel_args)
         if not found:
-            found = searchview.search_parcels_custom(browseoldparcels=True, **parcel_args)
+            found = searchview.search_parcels_custom(old=True, **parcel_args)
 
         if len(found) == 1 and parcel.has_same_attribute_values(found[0]):
             parcel_args['divisionCode'] = parcel_args['division']

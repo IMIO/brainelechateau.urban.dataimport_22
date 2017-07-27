@@ -48,10 +48,10 @@ class IdMapper(Mapper):
 
     def __init__(self, importer, args):
         super(IdMapper, self).__init__(importer, args)
-        # load_architects()
-        # load_geometers()
-        # load_notaries()
-        # load_parcellings()
+        load_architects()
+        load_geometers()
+        load_notaries()
+        load_parcellings()
 
     def mapId(self, line):
         return normalizeString(self.getData('id'))
@@ -68,7 +68,24 @@ class ReferenceMapper(Mapper):
                 id = self.getData('id')
                 return "NC/%s" % (id)  + " old"
         elif CSVImporterSettings.file_type == 'new':
-            return self.getData('Reference')  + " new"
+            reference = self.getData('Reference')
+
+            # set year format to YYYY for PU licence
+            pattern = re.compile('^PUR-(\d{2})/(\d*)')
+            matchObj = re.match(pattern, reference, flags=0)
+            if matchObj:
+                group1 = matchObj.group(1)
+                try:
+                    if group1:
+                        if int(group1) > 50:
+                            reference = reference.replace(group1, "19" + group1)
+                        else:
+                            reference = reference.replace(group1, "20" + group1)
+                except ValueError:
+                    print "Not an int"
+
+
+            return reference
 
 
 class ReferenceDGO3Mapper(Mapper):
@@ -86,20 +103,22 @@ class PortalTypeMapper(Mapper):
     def mapPortal_type(self, line):
         if CSVImporterSettings.file_type == 'old':
             return 'BuildLicence'
-        type = self.getData('Type')
+        typeLicence = self.getData('Type')
         # if type and type.startswith("PE1"):
         #     return "EnvClassOne"
         # elif type and type.startswith("PE2"):
         #     return "EnvClassTwo"
         # else:
         #     raise NoObjectToCreateException
-        if type and len(type) >= 3:
+        if typeLicence and len(typeLicence) >= 3:
             type_map = self.getValueMapping('type_map')
-            base_type = type.strip()[0:3]
+            base_type = typeLicence.strip()[0:3]
             # if base_type in ['PE', 'PEX', 'PUN']:
             #     base_type = type.strip()[0:4]
             portal_type = type_map[base_type]
-
+            # if base_type != 'PUR':
+            #     return portal_type
+            # raise NoObjectToCreateException
             return portal_type
         else:
             raise NoObjectToCreateException
@@ -339,23 +358,27 @@ class TechnicalConditionsMapper(Mapper):
 
 class ArchitectMapper(PostCreationMapper):
     def mapArchitects(self, line, plone_object):
-        # archi_name = '%s %s %s' % (self.getData('Nom Architecte'), self.getData('Prenom Architecte'), self.getData('Societe Architecte'))
-        archi_name = ' %s %s' % ( self.getData('Prenom Architecte'), self.getData('Societe Architecte'))
-        fullname = cleanAndSplitWord(archi_name)
+        archi_id = self.getData('Num Architecte')
+        if not archi_id:
+            return []
+        archi_map = self.getValueMapping('architects_id_map')
+        try:
+            archi_title = archi_map[archi_id]
+        except KeyError:
+            return []
+
+        if not archi_title:
+            return []
+        fullname = cleanAndSplitWord(archi_title)
         if not fullname:
             return []
-        noisy_words = ['monsieur', 'madame', 'architecte', '&', ',', '.', 'or', 'mr', 'mme', '/']
-        name_keywords = [word.lower() for word in fullname if word.lower() not in noisy_words]
-        architects = self.catalog(portal_type='Architect', Title=name_keywords)
-        if len(architects) == 0:
-            Utils.createArchitect(archi_name)
-            architects = self.catalog(portal_type='Architect', Title=name_keywords)
+        architects = self.catalog(portal_type='Architect', Title=fullname)
         if len(architects) == 1:
             return architects[0].getObject()
         self.logError(self, line, 'No architects found or too much architects found',
                       {
-                          'raw_name': archi_name,
-                          'name': name_keywords,
+                          'raw_name': archi_id,
+                          'name': fullname,
                           'search_result': len(architects)
                       })
         return []
@@ -510,8 +533,8 @@ class ErrorsMapper(FinalMapper):
 
 class ContactFactory(BaseFactory):
     def getPortalType(self, container, **kwargs):
-        if container.portal_type in ['UrbanCertificateOne', 'UrbanCertificateTwo', 'NotaryLetter']:
-            return 'Proprietary'
+        # if container.portal_type in ['UrbanCertificateOne', 'NotaryLetter']:
+        #     return 'Proprietary'
         return 'Applicant'
 
 # mappers
